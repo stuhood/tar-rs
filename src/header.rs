@@ -620,6 +620,15 @@ impl Header {
         }
     }
 
+    fn to_hex(input: u32) -> String {
+      let mut s = String::new();
+      let bytes: [u8; 4] = unsafe { ::std::mem::transmute(input.to_be()) };
+      for &byte in bytes.iter() {
+        fmt::Write::write_fmt(&mut s, format_args!("{:02x}", byte)).unwrap();
+      }
+      s
+    }
+
     #[cfg(unix)]
     fn fill_platform_from(&mut self, meta: &fs::Metadata, mode: HeaderMode) {
         use libc;
@@ -638,6 +647,7 @@ impl Header {
             HeaderMode::__Nonexhaustive => panic!(),
         }
 
+        println!(">>> mode {}", Header::to_hex(meta.mode()));
         self.set_mode(meta.mode() as u32);
 
         // Note that if we are a GNU header we *could* set atime/ctime, except
